@@ -2,12 +2,23 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 
-const DB_DIR = path.join(process.cwd(), 'data');
+const isVercel = process.env.VERCEL === '1';
+const defaultDbDir = path.join(process.cwd(), 'data');
+export const DB_DIR = isVercel ? '/tmp/data' : defaultDbDir;
 const DB_PATH = path.join(DB_DIR, 'realtorconnect.db');
 
 // Ensure data directory exists
 if (!fs.existsSync(DB_DIR)) {
   fs.mkdirSync(DB_DIR, { recursive: true });
+}
+
+// Copy default data to tmp if it doesn't exist but local does (e.g. initial DB with tables)
+if (isVercel && !fs.existsSync(DB_PATH)) {
+    try {
+        if (fs.existsSync(path.join(defaultDbDir, 'realtorconnect.db'))) {
+            fs.copyFileSync(path.join(defaultDbDir, 'realtorconnect.db'), DB_PATH);
+        }
+    } catch(e) {}
 }
 
 let db: Database.Database;
