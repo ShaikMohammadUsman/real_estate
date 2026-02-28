@@ -6,7 +6,7 @@ import BrokerCard from '@/components/BrokerCard';
 
 const CITIES = ['Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Chennai', 'Pune', 'Kolkata', 'Ahmedabad', 'Jaipur', 'Surat', 'Lucknow', 'Bhopal', 'Patna', 'Nagpur', 'Indore'];
 const STATES = ['Maharashtra', 'Delhi', 'Karnataka', 'Telangana', 'Tamil Nadu', 'Gujarat', 'West Bengal', 'Rajasthan', 'Uttar Pradesh', 'Madhya Pradesh', 'Bihar'];
-const SPECIALIZATIONS = ['Residential', 'Commercial', 'Luxury', 'Industrial', 'Agricultural Land', 'Investment', 'Rental Properties', 'New Projects', 'Plots', 'Villas'];
+const SPECIALIZATIONS = ['Residential', 'Commercial', 'Luxury', 'Industrial', 'Agricultural Land', 'Investment', 'Rental Properties', 'New Projects', 'Plots', 'Villas', 'Flats'];
 const SORT_OPTIONS = [
     { value: 'featured', label: 'Featured First' },
     { value: 'rating', label: 'Highest Rated' },
