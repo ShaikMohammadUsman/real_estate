@@ -96,7 +96,10 @@ export default function BrokerProfileEdit() {
             if (res.ok) {
                 await refreshUser();
                 setSuccess(true);
-                setTimeout(() => setSuccess(false), 3000);
+                setTimeout(() => {
+                    setSuccess(false);
+                    router.push('/dashboard');
+                }, 1500);
             } else {
                 const data = await res.json();
                 setError(data.error || 'Failed to save');
