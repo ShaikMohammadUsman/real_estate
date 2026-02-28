@@ -92,9 +92,12 @@ const DEMO_BROKERS = [
 ];
 
 export async function POST(request: NextRequest) {
-    // Only allow seeding in development
+    // For production, check for a secret key to prevent unauthorized seeding
     if (process.env.NODE_ENV === 'production') {
-        return NextResponse.json({ error: 'Not allowed in production' }, { status: 403 });
+        const authHeader = request.headers.get('x-seed-secret');
+        if (authHeader !== 'seed-me-now') {
+            return NextResponse.json({ error: 'Not allowed in production' }, { status: 403 });
+        }
     }
 
     try {

@@ -6,7 +6,7 @@ import { signToken } from '@/lib/auth';
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { email, password } = body;
+        const { email, password, role } = body;
 
         if (!email || !password) {
             return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
@@ -17,6 +17,11 @@ export async function POST(request: NextRequest) {
 
         if (!user) {
             return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+        }
+
+        // Check role if provided
+        if (role && user.role !== role) {
+            return NextResponse.json({ error: `You are not registered as a ${role}` }, { status: 401 });
         }
 
         const passwordMatch = await bcrypt.compare(password, user.password);

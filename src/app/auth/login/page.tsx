@@ -1,14 +1,17 @@
 'use client';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Building2, Eye, EyeOff } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Building2, Eye, EyeOff, User, BadgeCheck } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
-export default function LoginPage() {
+function LoginForm() {
     const { login } = useAuth();
     const router = useRouter();
-    const [form, setForm] = useState({ email: '', password: '' });
+    const searchParams = useSearchParams();
+    const defaultRole = searchParams.get('role') as 'customer' | 'broker' || 'customer';
+
+    const [form, setForm] = useState({ email: '', password: '', role: defaultRole });
     const [showPass, setShowPass] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -17,7 +20,7 @@ export default function LoginPage() {
         e.preventDefault();
         setError('');
         setLoading(true);
-        const result = await login(form.email, form.password);
+        const result = await login(form.email, form.password, form.role);
         if (result.success) {
             router.push('/dashboard');
         } else {
@@ -45,8 +48,38 @@ export default function LoginPage() {
                     </Link>
                     <h1 style={{ fontSize: 26, fontWeight: 800, marginTop: 28 }}>Welcome back</h1>
                     <p style={{ color: 'var(--text-secondary)', marginTop: 8, fontSize: 14 }}>
-                        Sign in to your RealtorConnect account
+                        Sign in as a {form.role === 'broker' ? 'Broker' : 'Customer'}
                     </p>
+                </div>
+
+                {/* Role toggle */}
+                <div style={{
+                    display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20,
+                    background: 'var(--dark-3)',
+                    borderRadius: 'var(--radius-md)', padding: 6,
+                    border: '1px solid var(--border-subtle)',
+                }}>
+                    {[
+                        { value: 'customer', label: 'Customer', icon: <User size={16} /> },
+                        { value: 'broker', label: 'Broker', icon: <BadgeCheck size={16} /> },
+                    ].map(role => (
+                        <button
+                            key={role.value}
+                            type="button"
+                            onClick={() => setForm(p => ({ ...p, role: role.value as any }))}
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center',
+                                padding: '10px 8px',
+                                background: form.role === role.value ? 'var(--gradient-gold)' : 'transparent',
+                                color: form.role === role.value ? '#0A0A0F' : 'var(--text-secondary)',
+                                border: 'none', borderRadius: 'var(--radius-sm)', cursor: 'pointer',
+                                fontWeight: 600, fontSize: 13,
+                                transition: 'all 0.2s',
+                            }}
+                        >
+                            {role.icon} {role.label}
+                        </button>
+                    ))}
                 </div>
 
                 {/* Form Card */}
@@ -108,9 +141,17 @@ export default function LoginPage() {
 
                 <p style={{ textAlign: 'center', fontSize: 14, color: 'var(--text-secondary)', marginTop: 20 }}>
                     Don't have an account?{' '}
-                    <Link href="/auth/register" style={{ color: 'var(--gold)', fontWeight: 600 }}>Create account</Link>
+                    <Link href={`/auth/register?role=${form.role}`} style={{ color: 'var(--gold)', fontWeight: 600 }}>Create account</Link>
                 </p>
             </div>
         </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<div style={{ paddingTop: 100, textAlign: 'center' }}>Loading...</div>}>
+            <LoginForm />
+        </Suspense>
     );
 }
